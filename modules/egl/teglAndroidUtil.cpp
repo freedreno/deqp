@@ -30,7 +30,7 @@
 #include "eglwLibrary.hpp"
 #include "eglwEnums.hpp"
 
-#if (DE_OS == DE_OS_ANDROID)
+#if 0
 #	include "tcuAndroidInternals.hpp"
 #endif
 
@@ -49,7 +49,7 @@ using eglu::AttribMap;
 using namespace glw;
 using namespace eglw;
 
-#if (DE_OS != DE_OS_ANDROID)
+#if 1
 
 MovePtr<ImageSource> createAndroidNativeImageSource	(GLenum format)
 {

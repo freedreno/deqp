@@ -1,6 +1,45 @@
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
+PNG_DIR = external/libpng/src
+#PNG_INC_DIR = $(PNG_DIR)
+PNG_SRC_FILES = $(PNG_DIR)/png.c \
+	$(PNG_DIR)/pngerror.c \
+	$(PNG_DIR)/pngget.c \
+	$(PNG_DIR)/pngmem.c \
+	$(PNG_DIR)/pngpread.c \
+	$(PNG_DIR)/pngread.c \
+	$(PNG_DIR)/pngrio.c \
+	$(PNG_DIR)/pngrtran.c \
+	$(PNG_DIR)/pngrutil.c \
+	$(PNG_DIR)/pngset.c \
+	$(PNG_DIR)/pngtrans.c \
+	$(PNG_DIR)/pngwio.c \
+	$(PNG_DIR)/pngwrite.c \
+	$(PNG_DIR)/pngwtran.c \
+	$(PNG_DIR)/pngwutil.c \
+	$(PNG_DIR)/arm/arm_init.c  \
+	$(PNG_DIR)/arm/filter_neon_intrinsics.c
+
+ZLIB_DIR = external/zlib/src
+ZLIB_SRC_FILES = \
+	$(ZLIB_DIR)/adler32.c \
+	$(ZLIB_DIR)/compress.c \
+	$(ZLIB_DIR)/crc32.c \
+	$(ZLIB_DIR)/deflate.c \
+	$(ZLIB_DIR)/gzclose.c \
+	$(ZLIB_DIR)/gzlib.c \
+	$(ZLIB_DIR)/gzread.c \
+	$(ZLIB_DIR)/gzwrite.c \
+	$(ZLIB_DIR)/infback.c \
+	$(ZLIB_DIR)/inflate.c \
+	$(ZLIB_DIR)/inftrees.c \
+	$(ZLIB_DIR)/inffast.c \
+	$(ZLIB_DIR)/trees.c \
+	$(ZLIB_DIR)/uncompr.c \
+	$(ZLIB_DIR)/zutil.c
+
+
 # The clang-tidy google-explicit-constructor warning is issued to nearly
 # 1000 conversion constructors in this project. They are from more than
 # 500 source files. Most of them should be declared explicit, but many
@@ -12,8 +51,10 @@ delibs_dir := $(LOCAL_PATH)/framework/delibs
 deqp_dir := $(LOCAL_PATH)/
 
 LOCAL_MODULE_TAGS := tests
-LOCAL_MODULE := libdeqp
+LOCAL_MODULE := deqp
 LOCAL_SRC_FILES := \
+	$(PNG_SRC_FILES) \
+	$(ZLIB_SRC_FILES) \
 	execserver/xsDefs.cpp \
 	execserver/xsExecutionServer.cpp \
 	execserver/xsPosixFileReader.cpp \
@@ -279,6 +320,8 @@ LOCAL_SRC_FILES := \
 	external/vulkancts/modules/vulkan/ycbcr/vktYCbCrTests.cpp \
 	external/vulkancts/modules/vulkan/ycbcr/vktYCbCrUtil.cpp \
 	external/vulkancts/modules/vulkan/ycbcr/vktYCbCrViewTests.cpp \
+	framework/platform/tcuMain.cpp \
+	framework/platform/surfaceless/tcuSurfacelessPlatform.cpp \
 	framework/common/tcuApp.cpp \
 	framework/common/tcuArray.cpp \
 	framework/common/tcuAstcUtil.cpp \
@@ -452,19 +495,6 @@ LOCAL_SRC_FILES := \
 	framework/opengl/wrapper/glwInitES30Direct.cpp \
 	framework/opengl/wrapper/glwInitFunctions.cpp \
 	framework/opengl/wrapper/glwWrapper.cpp \
-	framework/platform/android/tcuAndroidAssets.cpp \
-	framework/platform/android/tcuAndroidExecService.cpp \
-	framework/platform/android/tcuAndroidInternals.cpp \
-	framework/platform/android/tcuAndroidJNI.cpp \
-	framework/platform/android/tcuAndroidMain.cpp \
-	framework/platform/android/tcuAndroidNativeActivity.cpp \
-	framework/platform/android/tcuAndroidPlatform.cpp \
-	framework/platform/android/tcuAndroidPlatformCapabilityQueryJNI.cpp \
-	framework/platform/android/tcuAndroidRenderActivity.cpp \
-	framework/platform/android/tcuAndroidTestActivity.cpp \
-	framework/platform/android/tcuAndroidUtil.cpp \
-	framework/platform/android/tcuAndroidWindow.cpp \
-	framework/platform/android/tcuTestLogParserJNI.cpp \
 	framework/qphelper/qpCrashHandler.c \
 	framework/qphelper/qpDebugOut.c \
 	framework/qphelper/qpInfo.c \
@@ -1022,7 +1052,6 @@ LOCAL_C_INCLUDES := \
 	$(deqp_dir)/external/vulkancts/modules/vulkan/ycbcr \
 
 deqp_compile_flags := \
-	-DDEQP_SUPPORT_GLES1=1 \
 	-DDE_ANDROID_API=9 \
 	-D_XOPEN_SOURCE=600 \
 	-DDEQP_TARGET_NAME=\"android\" \
@@ -1031,9 +1060,10 @@ deqp_compile_flags := \
 	-DQP_SUPPORT_PNG=1 \
 	-Wall \
 	-Werror \
-	-Wconversion \
+	-Wno-conversion \
 	-fwrapv \
-	-Wno-sign-conversion
+	-Wno-sign-conversion \
+	-Wno-shorten-64-to-32
 
 LOCAL_SHARED_LIBRARIES := \
 		libEGL \
@@ -1044,6 +1074,8 @@ LOCAL_SHARED_LIBRARIES := \
 		libc \
 		libz \
 		libdl
+
+LOCAL_LDLIBS := -lEGL -lGLESv2 -landroid -llog
 
 LOCAL_STATIC_LIBRARIES := \
 		libpng_ndk \
@@ -1062,7 +1094,7 @@ LOCAL_TIDY_CHECKS := \
     -google-runtime-member-string-references, \
     -google-runtime-operator, \
 
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_EXECUTABLE)
 
 
 # Build the test APKs using their own makefiles

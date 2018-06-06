@@ -343,6 +343,8 @@ EglRenderContext::EglRenderContext(const glu::RenderConfig& config, const tcu::C
 		case glu::RenderConfig::SURFACETYPE_OFFSCREEN_GENERIC:
 			egl_surface = eglCreatePbufferSurface(m_eglDisplay, egl_config, &surface_attribs[0]);
 			break;
+		default:
+			throw tcu::ResourceError("invalid surface type");
 	}
 
 	context_attribs.push_back(EGL_CONTEXT_MAJOR_VERSION_KHR);
