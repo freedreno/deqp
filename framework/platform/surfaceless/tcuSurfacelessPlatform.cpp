@@ -146,8 +146,18 @@ bool isEGLExtensionSupported(
 		eglw::EGLDisplay display,
 		const std::string& extName)
 {
-	const vector<string> exts = eglu::getClientExtensions(egl);
-	return de::contains(exts.begin(), exts.end(), extName);
+	try
+	{
+		const vector<string> exts = eglu::getClientExtensions(egl);
+		return de::contains(exts.begin(), exts.end(), extName);
+	}
+	catch (const eglu::Error& error)
+	{
+		// EGL_BAD_DISPLAY is generated if client extensions are not supported.
+		if (error.getError() != EGL_BAD_DISPLAY)
+			throw;
+		return false;
+	}
 }
 
 class GetProcFuncLoader : public glw::FunctionLoader
