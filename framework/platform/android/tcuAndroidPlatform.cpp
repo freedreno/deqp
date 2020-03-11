@@ -280,35 +280,20 @@ private:
 	WindowRegistry&		m_windowRegistry;
 };
 
-static size_t getTotalSystemMemory (ANativeActivity* activity)
+static size_t getTotalSystemMemory (void)
 {
 	const size_t	MiB		= (size_t)(1<<20);
 
-	try
-	{
-		const size_t	cddRequiredSize	= getCDDRequiredSystemMemory(activity);
+	// Use relatively high fallback size to encourage CDD-compliant behavior
+	const size_t	fallbackSize	= (sizeof(void*) == sizeof(deUint64)) ? 2048*MiB : 1024*MiB;
 
-		print("Device has at least %.2f MiB total system memory per Android CDD\n", double(cddRequiredSize) / double(MiB));
-
-		return cddRequiredSize;
-	}
-	catch (const std::exception& e)
-	{
-		// Use relatively high fallback size to encourage CDD-compliant behavior
-		const size_t	fallbackSize	= (sizeof(void*) == sizeof(deUint64)) ? 2048*MiB : 1024*MiB;
-
-		print("WARNING: Failed to determine system memory size required by CDD: %s\n", e.what());
-		print("WARNING: Using fall-back size of %.2f MiB\n", double(fallbackSize) / double(MiB));
-
-		return fallbackSize;
-	}
+	return fallbackSize;
 }
 
 // Platform
 
-Platform::Platform (NativeActivity& activity)
-	: m_activity			(activity)
-	, m_totalSystemMemory	(getTotalSystemMemory(activity.getNativeActivity()))
+Platform::Platform (void)
+	: m_totalSystemMemory	(getTotalSystemMemory())
 {
 	m_nativeDisplayFactoryRegistry.registerFactory(new NativeDisplayFactory(m_windowRegistry));
 	m_contextFactoryRegistry.registerFactory(new eglu::GLContextFactory(m_nativeDisplayFactoryRegistry));
@@ -331,7 +316,7 @@ vk::Library* Platform::createLibrary (void) const
 
 void Platform::describePlatform (std::ostream& dst) const
 {
-	tcu::Android::describePlatform(m_activity.getNativeActivity(), dst);
+	dst << "unknown";
 }
 
 void Platform::getMemoryLimits (vk::PlatformMemoryLimits& limits) const
@@ -371,3 +356,8 @@ bool Platform::hasDisplay (vk::wsi::Type wsiType) const
 
 } // Android
 } // tcu
+
+tcu::Platform* createPlatform (void)
+{
+	return new tcu::Android::Platform();
+}

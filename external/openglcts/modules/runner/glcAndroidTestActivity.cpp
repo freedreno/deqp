@@ -61,7 +61,7 @@ static deUint32 getFlags(ANativeActivity* activity)
 TestThread::TestThread(NativeActivity& activity, tcu::Android::AssetArchive& archive, const std::string& logPath,
 					   glu::ApiType runType, deUint32 runFlags)
 	: RenderThread(activity)
-	, m_platform(activity)
+	, m_platform()
 	, m_archive(archive)
 	, m_app(m_platform, m_archive, logPath.c_str(), runType, runFlags)
 	, m_finished(false)
