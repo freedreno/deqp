@@ -131,7 +131,7 @@ void deAssertFail (const char* reason, const char* file, int line)
 	raise(SIGTRAP);
 	abort();
 #elif (DE_OS == DE_OS_ANDROID)
-	__android_log_print(ANDROID_LOG_ERROR, "delibs", "Assertion '%s' failed at %s:%d", reason, file, line);
+	fprintf(stderr, "Assertion '%s' failed at %s:%d", reason, file, line);
 	__assert(file, line, reason);
 #else
 #	error Implement assertion function on your platform.
