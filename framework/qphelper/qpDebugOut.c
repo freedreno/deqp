@@ -89,7 +89,7 @@ void qpDiev (const char* format, va_list args)
 }
 
 /* print() implementation. */
-#if (DE_OS == DE_OS_ANDROID)
+#if (0)
 
 #include <android/log.h>
 
