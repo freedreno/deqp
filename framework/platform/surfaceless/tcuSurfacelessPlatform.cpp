@@ -89,7 +89,7 @@ class VulkanLibrary : public vk::Library
 {
 public:
 	VulkanLibrary (void)
-		: m_library	("libvulkan.so.1")
+		: m_library	("libvulkan.so")
 		, m_driver	(m_library)
 	{
 	}
